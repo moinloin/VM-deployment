@@ -1,4 +1,4 @@
-name: Local Self-Hosted Deployment
+name: Deployment
 
 on:
   push:
