@@ -38,7 +38,17 @@ def deploy():
     subprocess.run(["terraform", "init"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
     subprocess.run(["terraform", "apply", "-auto-approve"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
 
-    return jsonify({"VM was created successfully", "name": name, "ip": ip})
+    subprocess.run([
+    "ansible-playbook",
+    "-i", f"{ip},",
+    "-e", 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"',
+    "-e", "ansible_user=debian",
+    "setup_vm.yml"
+    ], cwd=os.path.join(target_dir, "ansible"), check=True)
+
+
+
+    return jsonify({"message": "VM was created successfully", "name": name, "ip": ip})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
