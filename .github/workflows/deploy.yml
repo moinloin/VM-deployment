@@ -39,6 +39,7 @@ jobs:
       - name: Run New Container
         run: |
           docker run -d --network host \
+            --env-file /opt/vm-deployment/.env \
             -v ~/VM-management:/app/../VM-management \
             -v ~/.ssh:/root/.ssh \
             --name vm-deployment-app \

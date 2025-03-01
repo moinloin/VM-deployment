@@ -8,12 +8,12 @@ variable "proxmox_node" {}
 
 variable "ssh_key" {}
 
-variable "pm_vm_username" {}
+variable "vm_name" {}
+
+variable "vm_username" {}
 
 variable "vm_password" {}
 
 variable "static_ip_address" {}
 
 variable "static_ip_gateway" {}
-
-variable "vm_name" {}
