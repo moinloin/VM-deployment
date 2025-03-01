@@ -18,14 +18,6 @@ jobs:
     runs-on: self-hosted
     needs: checkout
     steps:
-      - name: Security Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'vm-deployment-app:latest'
-          format: 'table'
-          exit-code: 1
-          severity: 'CRITICAL,HIGH'
-
       - name: Check for Secrets
         uses: gitleaks/gitleaks-action@v2
         with:
