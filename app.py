@@ -34,6 +34,7 @@ def deploy():
     tmp_dir = os.path.join(target_dir, "terraform", ".tmp")
     os.makedirs(tmp_dir, exist_ok=True)
     env["TMPDIR"] = tmp_dir
+    env["TF_VAR_vm_name"] = name
 
     subprocess.run(["terraform", "init"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
     subprocess.run(["terraform", "apply", "-auto-approve"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
@@ -43,6 +44,7 @@ def deploy():
     "-i", f"{ip},",
     "-e", 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"',
     "-e", "ansible_user=debian",
+    "-e", f"vm_name={name}",
     "setup_vm.yml"
     ], cwd=os.path.join(target_dir, "ansible"), check=True)
 
