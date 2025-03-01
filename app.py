@@ -47,7 +47,7 @@ def deploy():
         "-e", 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"',
         "-e", 'ansible_user=debian',
         "-e", f"vm_name={name}",
-        "playbook.yml"
+        "setup_vm.yml"
     ], cwd=os.path.join(target_dir, "ansible"), check=True)
 
     return jsonify({
