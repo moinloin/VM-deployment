@@ -1,8 +1,7 @@
-- name: Install Docker Engine on Debian (Official Docker Guide)
+- name: Configure VM and install Docker
   hosts: all
   become: true
   tasks:
-
     - name: Update APT package index
       apt:
         update_cache: yes
@@ -16,29 +15,47 @@
           - lsb-release
         state: present
 
-    - name: Ensure /etc/apt/keyrings directory exists
-      file:
-        path: /etc/apt/keyrings
-        state: directory
-        mode: '0755'
+    - name: Ensure SSH allows password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication yes'
+      notify: Restart SSH
 
-    - name: Download Docker's official GPG key
+    - name: Ensure SSH allows PAM (needed for passwords)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^UsePAM'
+        line: 'UsePAM yes'
+      notify: Restart SSH
+
+    - name: Ensure SSH allows user login (no forced key-only login)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^ChallengeResponseAuthentication'
+        line: 'ChallengeResponseAuthentication yes'
+      notify: Restart SSH
+
+    - name: Flush handlers (restart SSH now if needed)
+      meta: flush_handlers
+
+    - name: Download Docker GPG key
       get_url:
         url: https://download.docker.com/linux/debian/gpg
         dest: /etc/apt/keyrings/docker.asc
         mode: '0644'
 
-    - name: Set up Docker repository (Official, hardcoded for bookworm + amd64)
+    - name: Set up Docker repository
       copy:
         content: |
           deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable
         dest: /etc/apt/sources.list.d/docker.list
 
-    - name: Update APT package index (after adding Docker repo)
+    - name: Update APT cache after adding Docker repo
       apt:
         update_cache: yes
 
-    - name: Install Docker Engine, CLI, containerd, and plugins
+    - name: Install Docker Engine and components
       apt:
         name:
           - docker-ce
@@ -48,8 +65,8 @@
           - docker-compose-plugin
         state: present
 
-    - name: Ensure Docker service is started and enabled
-      systemd:
-        name: docker
-        state: started
-        enabled: yes
+  handlers:
+    - name: Restart SSH
+      service:
+        name: ssh
+        state: restarted

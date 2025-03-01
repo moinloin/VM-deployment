@@ -53,7 +53,7 @@ def deploy():
     return jsonify({
         "status": "success",
         "message": "VM was created and configured successfully",
-        "vm_folder": name,
+        "name": name,
         "ip": ip
     })
 
