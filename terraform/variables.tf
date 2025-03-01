@@ -12,3 +12,7 @@ variable "pm_vm_username" {}
 
 variable "pm_vm_password" {}
 
+variable "static_ip_address" {}
+
+variable "static_ip_gateway" {}
+
