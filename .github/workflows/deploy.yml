@@ -1,0 +1,45 @@
+name: Local Self-Hosted Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  checkout:
+    name: Checkout Code
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+  build:
+    name: Build Docker Image
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - name: Build Image
+        run: docker build -t vm-deployment-app:latest .
+
+  stop:
+    name: Stop Running Container
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Stop Old Container (if exists)
+        run: |
+          docker ps -a | grep vm-deployment-app && docker stop vm-deployment-app || true
+          docker ps -a | grep vm-deployment-app && docker rm vm-deployment-app || true
+
+  start:
+    name: Start New Container
+    runs-on: self-hosted
+    needs: stop
+    steps:
+      - name: Run New Container
+        run: |
+          docker run -d --network host \
+            -v ~/VM-management:/app/../VM-management \
+            -v ~/.ssh:/root/.ssh \
+            --name vm-deployment-app \
+            vm-deployment-app:latest
