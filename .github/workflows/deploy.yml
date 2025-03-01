@@ -36,6 +36,12 @@ jobs:
     runs-on: self-hosted
     needs: stop
     steps:
+      - name: Check .env exists
+        run: |
+          if [ ! -f /opt/vm-deployment/.env ]; then
+            echo ".env file is missing! Abort."
+            exit 1
+          fi
       - name: Run New Container
         run: |
           docker run -d --network host \
