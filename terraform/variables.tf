@@ -16,3 +16,4 @@ variable "static_ip_address" {}
 
 variable "static_ip_gateway" {}
 
+variable "vm_name" {}

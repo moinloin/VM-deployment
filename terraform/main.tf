@@ -20,7 +20,7 @@ provider "proxmox" {
 
 resource "proxmox_virtual_environment_vm" "vm" {
   node_name = var.proxmox_node
-  name      = "vm-${random_id.vm_suffix.hex}"
+  name      = var.vm_name
 
   clone {
     vm_id = 9000
