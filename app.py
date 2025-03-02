@@ -57,5 +57,36 @@ def deploy():
         "ip": ip
     })
 
+@app.route("/destroy", methods=["DELETE"])
+def destroy():
+    data = request.json
+    name = data.get("name")
+
+    if not name:
+        return jsonify({"error": "name is required"}), 400
+
+    target_dir = os.path.join(MANAGEMENT_DIR, name)
+
+    if not os.path.exists(target_dir):
+        return jsonify({"error": f"VM {name} does not exist"}), 404
+
+    try:
+        subprocess.run([
+            "terraform", "destroy", "-auto-approve",
+            "-var", f"vm_name={name}"
+        ], cwd=os.path.join(target_dir, "terraform"), check=True)
+
+        shutil.rmtree(target_dir)
+
+        return jsonify({
+            "status": "success",
+            "message": f"VM {name} was successfully destroyed"
+        })
+    except subprocess.CalledProcessError as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to destroy VM {name}: {e}"
+        }), 500        
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
