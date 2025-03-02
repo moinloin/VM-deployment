@@ -24,38 +24,60 @@ def deploy():
     if os.path.exists(target_dir):
         return jsonify({"error": f"VM {name} already exists"}), 409
 
-    os.makedirs(target_dir)
+    try:
+        os.makedirs(target_dir)
 
-    shutil.copytree(os.path.join(DEPLOYMENT_DIR, "terraform"), os.path.join(target_dir, "terraform"))
-    shutil.copytree(os.path.join(DEPLOYMENT_DIR, "ansible"), os.path.join(target_dir, "ansible"))
+        shutil.copytree(os.path.join(DEPLOYMENT_DIR, "terraform"), os.path.join(target_dir, "terraform"))
+        shutil.copytree(os.path.join(DEPLOYMENT_DIR, "ansible"), os.path.join(target_dir, "ansible"))
 
-    env = os.environ.copy()
-    env["TF_VAR_static_ip_address"] = f"{ip}/24"
-    env["TF_VAR_vm_name"] = name
-    env["TF_VAR_vm_password"] = password
+        env = os.environ.copy()
+        env["TF_VAR_static_ip_address"] = f"{ip}/24"
+        env["TF_VAR_vm_name"] = name
+        env["TF_VAR_vm_password"] = password
 
-    tmp_dir = os.path.join(target_dir, "terraform", ".tmp")
-    os.makedirs(tmp_dir, exist_ok=True)
-    env["TMPDIR"] = tmp_dir
+        tmp_dir = os.path.join(target_dir, "terraform", ".tmp")
+        os.makedirs(tmp_dir, exist_ok=True)
+        env["TMPDIR"] = tmp_dir
 
-    subprocess.run(["terraform", "init"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
-    subprocess.run(["terraform", "apply", "-auto-approve"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
+        subprocess.run(["terraform", "init"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
 
-    subprocess.run([
-        "ansible-playbook",
-        "-i", f"{ip},",
-        "-e", 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"',
-        "-e", 'ansible_user=debian',
-        "-e", f"vm_name={name}",
-        "setup_vm.yml"
-    ], cwd=os.path.join(target_dir, "ansible"), check=True)
+        subprocess.run([
+            "terraform", "apply", "-auto-approve",
+            "-var", f"static_ip_address={ip}/24",
+            "-var", f"vm_name={name}",
+            "-var", f"vm_password={password}"
+        ], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
 
-    return jsonify({
-        "status": "success",
-        "message": "VM was created and configured successfully",
-        "name": name,
-        "ip": ip
-    })
+        subprocess.run([
+            "ansible-playbook",
+            "-i", f"{ip},",
+            "-e", 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"',
+            "-e", 'ansible_user=debian',
+            "-e", f"vm_name={name}",
+            "setup_vm.yml"
+        ], cwd=os.path.join(target_dir, "ansible"), check=True)
+
+        return jsonify({
+            "status": "success",
+            "message": "VM was created and configured successfully",
+            "name": name,
+            "ip": ip
+        })
+
+    except subprocess.CalledProcessError as e:
+        error_message = e.stderr.decode("utf-8") if e.stderr else str(e)
+        shutil.rmtree(target_dir, ignore_errors=True)
+        return jsonify({
+            "status": "error",
+            "message": f"Deployment failed: {error_message}"
+        }), 500
+
+    except Exception as e:
+        shutil.rmtree(target_dir, ignore_errors=True)
+        return jsonify({
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}"
+        }), 500        
 
 @app.route("/destroy", methods=["DELETE"])
 def destroy():
