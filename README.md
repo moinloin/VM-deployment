@@ -60,9 +60,8 @@ This ensures that both the VM in Proxmox and the corresponding Terraform and Ans
 
 ## Planned Features
 
-- [ ] Add `/status` endpoint to check if a VM is running
 - [ ] Add a simple web frontend for triggering deployments and checking VM status
-- [ ] Optional notifications (Slack, email, webhook)
+- [ ] Notifications (Slack, email, webhook)
 
 ## Security
 
