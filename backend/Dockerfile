@@ -18,8 +18,8 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/sh
 RUN echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
 RUN apt-get update && apt-get install -y terraform
 
-COPY backend/app.py .
-COPY backend/terraform ./terraform/
+COPY app.py .
+COPY terraform ./terraform/
 COPY ansible ./ansible/
 
 EXPOSE 5000
