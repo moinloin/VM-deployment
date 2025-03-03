@@ -1,26 +1,22 @@
 # VM Deployment API
 
-This project provides a lightweight API to automatically create and configure virtual machines on a Proxmox cluster. The API acts as a wrapper around Terraform and Ansible, combining infrastructure provisioning and configuration management into a simple HTTP interface.
+This project provides a lightweight system to automatically create, configure, and manage virtual machines on a Proxmox cluster. It consists of two main components:
 
-## What does this API do?
+Backend: A Flask-based API to provision VMs via Terraform and configure them via Ansible.
+Frontend: A modern web interface to trigger deployments, destroy VMs and visualize deployment results.
 
-- Provides a simple REST API to trigger VM creation.
-- Uses Terraform to clone a Proxmox template, configure resources, and set up networking.
-- Runs an Ansible playbook immediately after creation to configure the VM.
-- Runs inside a Docker container to ensure portability.
-- Deploys automatically via GitHub Actions whenever changes are pushed.
+## Architecture Overview
 
-## Technology Stack
+| Component        | Technology          |
+|------------------|---------------------|
+| Backend API      | Flask                |
+| Infrastructure   | Terraform            |
+| Configuration    | Ansible              |
+| Frontend         | Node.js + Express + Vanilla JS |
+| Containerization | Docker                |
+| CI/CD            | GitHub Actions       |
 
-| Area                  | Tool                     |
-|-----------------|------------------|
-| API                         | Flask                    |
-| Infrastructure     | Terraform             |
-| Configuration | Ansible               |
-| Container          | Docker                  |
-| Deployment    | GitHub Actions |
-
-## API Endpoints
+## Backend - API Endpoints
 
 ### /deploy (POST)
 
@@ -49,6 +45,21 @@ The response contains:
 
 This ensures that both the VM in Proxmox and the corresponding Terraform and Ansible files are completely removed.
 
+## Frontend - Web Interface
+
+### Features
+
+- Trigger new VM deployments
+- Destroy existing VMs
+- See real-time feedback from the backend (success/error messages)
+
+### Technology Stack
+
+| Area            | Technology         |
+|-----------------|--------------------|
+| Frontend Server | Node.js + Express  |
+| Frontend UI     | HTML, CSS (Dark Mode), JavaScript |
+| Styling         | Custom CSS |
 
 ## Completed Features
 
@@ -57,15 +68,17 @@ This ensures that both the VM in Proxmox and the corresponding Terraform and Ans
 - [x] GitHub Actions pipeline in place
 - [x] Proxmox integration via Terraform works
 - [x] Automatic VM configuration with Ansible
+- [x] Simple Web UI for Deployment Management
 
 ## Planned Features
 
-- [ ] Add a simple web frontend for triggering deployments and checking VM status
+- [ ] VM Status Overview Dashboard
 - [ ] Notifications (Slack, email, webhook)
+- [ ] Deployment History Logs
 
 ## Security
 
-- Proxmox credentials are **not** stored in the repository.
-- All secrets are injected via environment variables.
-- Ansible connects using the credentials provisioned by Terraform during VM creation.
-- This API is intended to run inside a trusted management network, not exposed publicly.
+- Proxmox credentials are not stored in this repository.
+- Secrets are injected via environment variables.
+- Frontend does not talk directly to Proxmox — only the backend handles that.
+- The whole system should only run inside a trusted management network.
