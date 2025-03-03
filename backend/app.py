@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 import shutil
 import subprocess
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://192.168.15.6:4000"}})
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEPLOYMENT_DIR = BASE_DIR
@@ -112,3 +114,4 @@ def destroy():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+    

@@ -29,7 +29,7 @@ jobs:
     needs: checkout
     steps:
       - name: Build Image
-        run: docker build -t vm-deployment-app:latest ./backend
+        run: docker build -t vm-deployment-backend:latest ./backend
 
   stop:
     name: Stop Running Container
@@ -59,4 +59,4 @@ jobs:
             -v ~/VM-management:/app/../VM-management \
             -v ~/.ssh:/root/.ssh \
             --name vm-deployment-app \
-            vm-deployment-app:latest
+            vm-deployment-backend:latest
