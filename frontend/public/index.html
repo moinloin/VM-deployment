@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>VM Deployment Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="ui.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>VM Manager</h2>
+    <nav>
+        <a href="#">✅ Deployment Tool</a></br>
+        <a href="#">⚙️ Management</a></br>
+        <a href="#">📊 Logs</a>
+    </nav>
+</div>
+
+<div class="main">
+    <div class="card">
+        <h1>VM Deployment Manager</h1>
+
+        <section class="block">
+            <h2>Deploy new VM</h2>
+            <input type="text" id="name" placeholder="VM name">
+            <input type="text" id="ip" placeholder="static IP">
+            <input type="password" id="password" placeholder="VM password">
+            <button class="btn deploy" id="deployBtn">Deploy VM</button>
+        </section>
+
+        <hr>
+
+        <section class="block">
+            <h2>Destroy VM</h2>
+            <input type="text" id="delete-name" placeholder="VM name">
+            <button class="btn destroy" id="destroyBtn">Destroy VM</button>
+        </section>
+
+        <div id="response" class="response"></div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    font-family: Arial, sans-serif;
+    background-color: #0f172a;
+    color: #f9fafb;
+}
+
+.sidebar {
+    width: 220px;
+    background-color: #1f2937;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar h2 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #f3f4f6;
+    margin-bottom: 16px;
+}
+
+.sidebar nav a {
+    text-decoration: none;
+    color: #d1d5db;
+    padding: 2px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    margin: 3px
+}
+
+.sidebar nav a:hover {
+    background-color: #374151;
+}
+
+.main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    background-color: #1e293b;
+    padding: 32px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    text-align: left;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    background-color: #334155;
+    border: 1px solid #475569;
+    color: white;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn.deploy {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn.deploy:hover {
+    background-color: #2563eb;
+}
+
+.btn.destroy {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn.destroy:hover {
+    background-color: #dc2626;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #475569;
+    margin: 24px 0;
+}
+
+.response {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+    display: none;
+}
+
+.response.success {
+    background-color: #22c55e;
+    color: #f0fdf4;
+}
+
+.response.error {
+    background-color: #dc2626;
+    color: #fef2f2;
+}
