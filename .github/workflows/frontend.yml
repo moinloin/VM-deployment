@@ -1,0 +1,53 @@
+name: Fontend Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  checkout:
+    name: Checkout Code
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+  security:
+    name: Security Checks
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - name: Check for Secrets
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          config-path: ".github/gitleaks.toml"
+
+  build:
+    name: Build Docker Image
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - name: Build Image
+        run: docker build -t vm-deployment-frontend:latest ./frontend
+
+  stop:
+    name: Stop Running Container
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Stop Old Container (if exists)
+        run: |
+          docker ps -a | grep vm-deployment-frontend && docker stop vm-deployment-frontend || true
+          docker ps -a | grep vm-deployment-frontend && docker rm vm-deployment-frontend || true
+
+  start:
+    name: Start New Container
+    runs-on: self-hosted
+    needs: stop
+    steps:
+      - name: Run New Container
+        run: |
+          docker run -d \
+            --name vm-deployment-frontend \
+            vm-deployment-frontend:latest
