@@ -1,4 +1,4 @@
-name: App Deployment
+name: Backend Deployment
 
 on:
   push:
@@ -38,8 +38,8 @@ jobs:
     steps:
       - name: Stop Old Container (if exists)
         run: |
-          docker ps -a | grep vm-deployment-app && docker stop vm-deployment-app || true
-          docker ps -a | grep vm-deployment-app && docker rm vm-deployment-app || true
+          docker ps -a | grep vm-deployment-backend && docker stop vm-deployment-backend || true
+          docker ps -a | grep vm-deployment-backend && docker rm vm-deployment-backend || true
 
   start:
     name: Start New Container
