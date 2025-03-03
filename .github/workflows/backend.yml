@@ -58,5 +58,5 @@ jobs:
             --env-file /opt/vm-deployment/.env \
             -v ~/VM-management:/app/../VM-management \
             -v ~/.ssh:/root/.ssh \
-            --name vm-deployment-app \
+            --name vm-deployment-backend \
             vm-deployment-backend:latest
