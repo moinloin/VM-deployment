@@ -14,4 +14,4 @@ COPY . .
 # Port definieren (falls du über Docker-Compose aufrufst)
 EXPOSE 4000
 
-CMD ["npm", "start"]
+CMD ["node", "index.js"]
