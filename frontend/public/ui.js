@@ -2,13 +2,13 @@ import { deployVM, destroyVM } from './api.js';
 
 function showResponse(message, isError = false) {
     const responseDiv = document.getElementById('response');
-    responseDiv.innerText = message;
+    responseDiv.innerHTML = message;
     responseDiv.className = `response ${isError ? 'error' : 'success'}`;
     responseDiv.style.display = 'block';
 
     setTimeout(() => {
         responseDiv.style.display = 'none';
-    }, 5000);
+    }, 15000);
 }
 
 async function handleDeploy() {
@@ -26,7 +26,8 @@ async function handleDeploy() {
     try {
         const result = await deployVM(name, ip, password);
         if (result.status === 'success') {
-            showResponse(`✅ Erfolgreich deployed: ${result.name} @ ${result.ip}`);
+            const sshLink = `ssh://debian@${ip}`;
+            showResponse(`✅ Erfolgreich deployed: ${result.name} @ ${result.ip} <br><a href="${sshLink}" target="_blank">🔗 Direkt per SSH verbinden</a>`);
         } else {
             showResponse(`❌ Fehler: ${result.message}`, true);
         }
