@@ -26,3 +26,18 @@ variable "static_ip_address" {
   }
 
 variable "static_ip_gateway" {}
+
+variable "vm_cores" {
+  description = "Number of CPU cores for the VM"
+  default     = 2
+}
+
+variable "vm_memory" {
+  description = "Amount of memory (in MB) for the VM"
+  default     = 4096
+}
+
+variable "vm_disk_size" {
+  description = "Disk size in GB"
+  default     = 50
+}

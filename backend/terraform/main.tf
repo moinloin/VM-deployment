@@ -32,11 +32,17 @@ resource "proxmox_virtual_environment_vm" "vm" {
   }
 
   cpu {
-    cores = 2
+      cores = var.vm_cores
   }
 
   memory {
-    dedicated = 4096
+      dedicated = var.vm_memory
+  }
+
+  disk {
+      size         = "${var.vm_disk_size}"
+      datastore_id = "local-zfs"
+      interface    = "scsi0"
   }
 
   network_device {

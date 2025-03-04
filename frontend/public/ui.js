@@ -2,7 +2,6 @@ import { deployVM, destroyVM } from './api.js';
 
 function showResponse(message, isError = false) {
     const responseDiv = document.getElementById('response');
-    responseDiv.innerHTML = message;
     responseDiv.className = `response ${isError ? 'error' : 'success'}`;
     responseDiv.style.display = 'block';
 
@@ -17,22 +16,21 @@ async function handleDeploy() {
     const password = document.getElementById('password').value.trim();
 
     if (!name || !ip || !password) {
-        showResponse('Bitte alle Felder ausfüllen!', true);
+        showResponse('Please fill all fields!', true);
         return;
     }
 
-    showResponse('⏳ Deployment läuft...');
+    showResponse('⏳ Deployment running...');
 
     try {
         const result = await deployVM(name, ip, password);
         if (result.status === 'success') {
-            const sshLink = `ssh://debian@${ip}`;
-            showResponse(`✅ Erfolgreich deployed: ${result.name} @ ${result.ip} <br><a href="${sshLink}" target="_blank">🔗 Direkt per SSH verbinden</a>`);
+            showResponse(`✅ Successfull deployed: ${result.name} @ ${result.ip}`);
         } else {
-            showResponse(`❌ Fehler: ${result.message}`, true);
+            showResponse(`❌ Error: ${result.message}`, true);
         }
     } catch (error) {
-        showResponse('❌ Verbindung fehlgeschlagen', true);
+        showResponse('❌ Connection failed', true);
     }
 }
 
@@ -40,21 +38,21 @@ async function handleDestroy() {
     const name = document.getElementById('delete-name').value.trim();
 
     if (!name) {
-        showResponse('Bitte VM-Name eingeben!', true);
+        showResponse('Please enter VM name!', true);
         return;
     }
 
-    showResponse('⏳ VM wird gelöscht...');
+    showResponse('⏳ VM is deleted...');
 
     try {
         const result = await destroyVM(name);
         if (result.status === 'success') {
-            showResponse(`✅ VM ${name} wurde gelöscht`);
+            showResponse(`✅ VM ${name} ist deleted`);
         } else {
-            showResponse(`❌ Fehler: ${result.message}`, true);
+            showResponse(`❌ Error: ${result.message}`, true);
         }
     } catch (error) {
-        showResponse('❌ Verbindung fehlgeschlagen', true);
+        showResponse('❌ Connection failed', true);
     }
 }
 

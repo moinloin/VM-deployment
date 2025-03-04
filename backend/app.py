@@ -17,6 +17,10 @@ def deploy():
     name = data.get("name")
     ip = data.get("ip")
     password = data.get("password")
+    cores = data.get("cores", "2")
+    memory = data.get("memory", "4096")
+    disk_size = data.get("disk_size", "50")
+
 
     if not all([name, ip, password]):
         return jsonify({"error": "name, ip and password are required"}), 400
@@ -44,11 +48,15 @@ def deploy():
         subprocess.run(["terraform", "init"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
 
         subprocess.run([
-            "terraform", "apply", "-auto-approve",
-            "-var", f"static_ip_address={ip}/24",
-            "-var", f"vm_name={name}",
-            "-var", f"vm_password={password}"
+           "terraform", "apply", "-auto-approve",
+           "-var", f"static_ip_address={ip}/24",
+           "-var", f"vm_name={name}",
+           "-var", f"vm_password={password}",
+           "-var", f"vm_cores={cores}",
+           "-var", f"vm_memory={memory}",
+           "-var", f"vm_disk_size={disk_size}"
         ], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
+
 
         subprocess.run([
             "ansible-playbook",
