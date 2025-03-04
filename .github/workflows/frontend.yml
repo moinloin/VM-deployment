@@ -48,6 +48,6 @@ jobs:
     steps:
       - name: Run New frontend
         run: |
-          docker run -d \
+          docker run -d -p 4000:4000 \
             --name vm-deployment-frontend \
             vm-deployment-frontend:latest
