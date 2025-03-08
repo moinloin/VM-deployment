@@ -2,12 +2,13 @@ import { deployVM, destroyVM } from './api.js';
 
 function showResponse(message, isError = false) {
     const responseDiv = document.getElementById('response');
+    responseDiv.innerText = message;  // Fix: Text wird jetzt angezeigt
     responseDiv.className = `response ${isError ? 'error' : 'success'}`;
     responseDiv.style.display = 'block';
 
     setTimeout(() => {
         responseDiv.style.display = 'none';
-    }, 15000);
+    }, 5000);
 }
 
 async function handleDeploy() {
@@ -25,7 +26,7 @@ async function handleDeploy() {
     try {
         const result = await deployVM(name, ip, password);
         if (result.status === 'success') {
-            showResponse(`✅ Successfull deployed: ${result.name} @ ${result.ip}`);
+            showResponse(`✅ Successfully deployed: ${result.name} @ ${result.ip}`);
         } else {
             showResponse(`❌ Error: ${result.message}`, true);
         }
@@ -42,12 +43,12 @@ async function handleDestroy() {
         return;
     }
 
-    showResponse('⏳ VM is deleted...');
+    showResponse('⏳ Deleting VM...');
 
     try {
         const result = await destroyVM(name);
         if (result.status === 'success') {
-            showResponse(`✅ VM ${name} ist deleted`);
+            showResponse(`✅ VM ${name} was deleted`);
         } else {
             showResponse(`❌ Error: ${result.message}`, true);
         }

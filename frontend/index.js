@@ -4,7 +4,6 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Statische Dateien ausliefern (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, 'public'), {
     setHeaders: (res, filePath) => {
         if (filePath.endsWith('.js')) {
@@ -13,7 +12,6 @@ app.use(express.static(path.join(__dirname, 'public'), {
     }
 }));
 
-// Fallback für SPA-Routing
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
