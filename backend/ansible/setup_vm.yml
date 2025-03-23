@@ -3,13 +3,13 @@
   become: true
   tasks:
 
-    - name: Wait until APT lock is released
+    - name: Wait until APT lock is released (before required packages)
       shell: |
         lsof /var/lib/dpkg/lock-frontend || true
-      register: apt_lock_check
+      register: apt_lock_check_before
       retries: 12
       delay: 5
-      until: apt_lock_check.stdout == ""
+      until: apt_lock_check_before.stdout == ""
       changed_when: false
 
     - name: Install required packages
@@ -61,24 +61,25 @@
       apt:
         update_cache: yes
 
-    - name: Wait until APT lock is released (before Docker install)
-      shell: |
-        lsof /var/lib/dpkg/lock-frontend || true
-      register: apt_lock_check_docker
-      retries: 12
-      delay: 5
-      until: apt_lock_check_docker.stdout == ""
-      changed_when: false
-
-    - name: Install Docker Engine and components
-      apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose-plugin
-        state: present
+    - name: Retry Docker install until lock is free
+      block:
+        - name: Install Docker Engine and components
+          apt:
+            name:
+              - docker-ce
+              - docker-ce-cli
+              - containerd.io
+              - docker-buildx-plugin
+              - docker-compose-plugin
+            state: present
+      rescue:
+        - name: Wait and retry if APT was locked
+          pause:
+            seconds: 5
+      retries: 10
+      delay: 6
+      register: docker_install
+      until: docker_install is succeeded
 
   handlers:
     - name: Restart SSH
