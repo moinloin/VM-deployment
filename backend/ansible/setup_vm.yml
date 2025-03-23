@@ -1,16 +1,17 @@
 - name: Configure VM and install Docker
   hosts: all
   become: true
-  tasks:
 
-    - name: Wait until APT lock is released (before required packages)
-      shell: |
-        lsof /var/lib/dpkg/lock-frontend || true
-      register: apt_lock_check_before
-      retries: 12
-      delay: 5
-      until: apt_lock_check_before.stdout == ""
+  tasks:
+    - name: Wait for cloud-init to finish (if running)
+      shell: cloud-init status --wait
+      register: cloud_init_status
       changed_when: false
+      failed_when: false
+      ignore_errors: true
+
+    - name: Wait until APT lock is released
+      shell: while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 5; done;
 
     - name: Install required packages
       apt:
@@ -20,6 +21,8 @@
           - gnupg
           - lsb-release
         state: present
+        update_cache: yes
+        force_apt_get: yes
 
     - name: Ensure SSH allows password authentication
       lineinfile:
@@ -60,26 +63,26 @@
     - name: Update APT cache after adding Docker repo
       apt:
         update_cache: yes
+        force_apt_get: yes
 
-    - name: Retry Docker install until lock is free
-      block:
-        - name: Install Docker Engine and components
-          apt:
-            name:
-              - docker-ce
-              - docker-ce-cli
-              - containerd.io
-              - docker-buildx-plugin
-              - docker-compose-plugin
-            state: present
-      rescue:
-        - name: Wait and retry if APT was locked
-          pause:
-            seconds: 5
+    - name: Wait until APT lock is released before Docker install
+      shell: while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 5; done;
+
+    - name: Install Docker and dependencies (with retries and lock timeout)
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+        force_apt_get: yes
+      register: result
       retries: 10
-      delay: 6
-      register: docker_install
-      until: docker_install is succeeded
+      delay: 10
+      until: result is succeeded
 
   handlers:
     - name: Restart SSH
