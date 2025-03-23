@@ -5,15 +5,12 @@
 
     - name: Wait until APT lock is released
       shell: |
-        while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-          echo "Waiting for APT lock..."
-          sleep 5
-        done
+        lsof /var/lib/dpkg/lock-frontend || true
+      register: apt_lock_check
+      retries: 12
+      delay: 5
+      until: apt_lock_check.stdout == ""
       changed_when: false
-
-    - name: Update APT package index
-      apt:
-        update_cache: yes
 
     - name: Install required packages
       apt:
