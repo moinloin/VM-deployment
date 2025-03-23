@@ -61,13 +61,13 @@
       apt:
         update_cache: yes
 
-    - name: Wait until APT lock is released
+    - name: Wait until APT lock is released (before Docker install)
       shell: |
         lsof /var/lib/dpkg/lock-frontend || true
-      register: apt_lock_check
+      register: apt_lock_check_docker
       retries: 12
       delay: 5
-      until: apt_lock_check.stdout == ""
+      until: apt_lock_check_docker.stdout == ""
       changed_when: false
 
     - name: Install Docker Engine and components
