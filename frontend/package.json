@@ -1,19 +1,19 @@
 {
-    "name": "vm-manager-frontend",
-    "version": "1.0.0",
-    "description": "Frontend für den VM Manager",
-    "main": "src/index.js",
-    "scripts": {
-        "start": "node src/index.js",
-        "dev": "nodemon src/index.js"
-    },
-    "dependencies": {
-        "express": "^4.21.2"
-    },
-    "devDependencies": {
-        "nodemon": "^3.0.2"
-    },
-    "engines": {
-        "node": ">=20.0.0"
-    }
+  "name": "vm-manager-frontend",
+  "version": "1.0.0",
+  "description": "Frontend für den VM Manager",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }
