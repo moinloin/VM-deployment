@@ -4,6 +4,9 @@ import os
 import shutil
 import subprocess
 import requests
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://192.168.15.6:4000"}})
