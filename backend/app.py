@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import shutil
 import subprocess
+import requests
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://192.168.15.6:4000"}})
@@ -119,6 +120,26 @@ def destroy():
             "status": "error",
             "message": f"Failed to destroy VM {name}: {e}"
         }), 500        
+
+@app.route("/vms", methods=["GET"])
+def list_vms():
+    api_url = os.environ.get("PROXMOX_API_URL")
+    token_id = os.environ.get("PROXMOX_API_TOKEN_ID")
+    token_secret = os.environ.get("PROXMOX_API_TOKEN_SECRET")
+
+    if not all([api_url, token_id, token_secret]):
+        return jsonify({"error": "Proxmox API credentials are missing"}), 500
+
+    try:
+        headers = {
+            "Authorization": f"PVEAPIToken={token_id}={token_secret}"
+        }
+        response = requests.get(f"{api_url}/api2/json/cluster/resources?type=vm", headers=headers, verify=False)
+        response.raise_for_status()
+        vms = response.json().get("data", [])
+        return jsonify({"vms": vms})
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch VMs: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
