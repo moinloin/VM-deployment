@@ -15,6 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEPLOYMENT_DIR = BASE_DIR
 MANAGEMENT_DIR = os.path.join(BASE_DIR, "..", "VM-management")
 
+
 @app.route("/deploy", methods=["POST"])
 def deploy():
     data = request.json
@@ -24,7 +25,6 @@ def deploy():
     cores = data.get("cores", "2")
     memory = data.get("memory", "4096")
     disk_size = data.get("disk_size", "50")
-
 
     if not all([name, ip, password]):
         return jsonify({"error": "name, ip and password are required"}), 400
@@ -44,6 +44,9 @@ def deploy():
         env["TF_VAR_static_ip_address"] = f"{ip}/24"
         env["TF_VAR_vm_name"] = name
         env["TF_VAR_vm_password"] = password
+        env["TF_VAR_vm_cores"] = cores
+        env["TF_VAR_vm_memory"] = memory
+        env["TF_VAR_vm_disk_size"] = disk_size
 
         tmp_dir = os.path.join(target_dir, "terraform", ".tmp")
         os.makedirs(tmp_dir, exist_ok=True)
@@ -52,15 +55,14 @@ def deploy():
         subprocess.run(["terraform", "init"], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
 
         subprocess.run([
-           "terraform", "apply", "-auto-approve",
-           "-var", f"static_ip_address={ip}/24",
-           "-var", f"vm_name={name}",
-           "-var", f"vm_password={password}",
-           "-var", f"vm_cores={cores}",
-           "-var", f"vm_memory={memory}",
-           "-var", f"vm_disk_size={disk_size}"
+            "terraform", "apply", "-auto-approve",
+            "-var", f"static_ip_address={ip}/24",
+            "-var", f"vm_name={name}",
+            "-var", f"vm_password={password}",
+            "-var", f"vm_cores={cores}",
+            "-var", f"vm_memory={memory}",
+            "-var", f"vm_disk_size={disk_size}"
         ], cwd=os.path.join(target_dir, "terraform"), check=True, env=env)
-
 
         subprocess.run([
             "ansible-playbook",
@@ -79,11 +81,10 @@ def deploy():
         })
 
     except subprocess.CalledProcessError as e:
-        error_message = e.stderr.decode("utf-8") if e.stderr else str(e)
         shutil.rmtree(target_dir, ignore_errors=True)
         return jsonify({
             "status": "error",
-            "message": f"Deployment failed: {error_message}"
+            "message": f"Deployment failed at: {e.cmd[0]} — {e.stderr if e.stderr else str(e)}"
         }), 500
 
     except Exception as e:
@@ -91,7 +92,8 @@ def deploy():
         return jsonify({
             "status": "error",
             "message": f"Unexpected error: {str(e)}"
-        }), 500        
+        }), 500
+
 
 @app.route("/destroy", methods=["DELETE"])
 def destroy():
@@ -122,7 +124,8 @@ def destroy():
         return jsonify({
             "status": "error",
             "message": f"Failed to destroy VM {name}: {e}"
-        }), 500        
+        }), 500
+
 
 @app.route("/vms", methods=["GET"])
 def list_vms():
@@ -144,6 +147,6 @@ def list_vms():
     except Exception as e:
         return jsonify({"error": f"Failed to fetch VMs: {str(e)}"}), 500
 
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-    
