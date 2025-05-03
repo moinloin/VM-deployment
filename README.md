@@ -1,6 +1,6 @@
 # VM Deployment API
 
-This project provides a lightweight system to automatically create, configure, and manage virtual machines on a Proxmox cluster. It consists of two main components:
+This project provides a system to automatically create, configure, and manage virtual machines on a Proxmox cluster. It consists of two main components:
 
 Backend: A Flask-based API to provision VMs via Terraform and configure them via Ansible.
 Frontend: A modern web interface to trigger deployments, destroy VMs and visualize deployment results.
